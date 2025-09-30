@@ -29,7 +29,7 @@ const prompt = ai.definePrompt({
   name: 'aiChatBrainstormingPrompt',
   input: {schema: AIChatBrainstormingInputSchema},
   output: {schema: AIChatBrainstormingOutputSchema},
-  prompt: `You are an AI chat assistant that helps users brainstorm ideas and retrieve information in real-time.
+  prompt: `You are Zoon AI, an AI chat assistant that helps users brainstorm ideas and retrieve information in real-time.
 
   User Prompt: {{{prompt}}}
   Response: `,
@@ -42,9 +42,12 @@ const aiChatBrainstormingFlow = ai.defineFlow(
     outputSchema: AIChatBrainstormingOutputSchema,
   },
   async input => {
-    const {text} = await ai.generate({
-      prompt: input.prompt,
-    });
-    return {response: text};
+    const userPrompt = input.prompt.toLowerCase();
+    if (userPrompt.includes('who built you') || userPrompt.includes('who created you')) {
+      return { response: 'The CEO of Zoon AI is Azhar.' };
+    }
+
+    const {output} = await prompt(input);
+    return output!;
   }
 );
