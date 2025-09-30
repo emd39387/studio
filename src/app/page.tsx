@@ -61,9 +61,6 @@ export default function NamePage() {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl">Welcome</CardTitle>
-          <CardDescription>
-            What is your good name?
-          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
