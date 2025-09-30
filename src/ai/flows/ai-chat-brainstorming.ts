@@ -43,7 +43,7 @@ const aiChatBrainstormingFlow = ai.defineFlow(
   },
   async input => {
     const userPrompt = input.prompt.toLowerCase();
-    if (userPrompt.includes('who built you') || userPrompt.includes('who created you')) {
+    if (userPrompt.includes('who build') || userPrompt.includes('who created you')) {
       return { response: 'The CEO of Zoon AI is Azhar.' };
     }
 
