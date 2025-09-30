@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Loader2, Code, Wand2 } from 'lucide-react';
+import { Loader2, Code, Wand2, Clipboard, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -32,21 +32,30 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   programmingLanguage: z.string().min(1, { message: 'Please select a language.' }),
   taskDescription: z.string().min(1, { message: 'Please describe the task.' }),
 });
 
+type CodeSnippet = {
+  language: string;
+  code: string;
+};
+
 type CodeAssistantOutput = {
-  generatedCode: string;
+  codeSnippets: CodeSnippet[];
   explanation: string;
   debugSuggestions: string;
 };
 
 export default function CodeAssistantPage() {
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [output, setOutput] = useState<CodeAssistantOutput | null>(null);
+  const [copiedStates, setCopiedStates] = useState<Record<number, boolean>>({});
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -59,13 +68,14 @@ export default function CodeAssistantPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setOutput(null);
+    setCopiedStates({});
     try {
       const result = await codeAssistantForLearning(values);
       setOutput(result);
     } catch (error) {
       console.error('Error with code assistant:', error);
       setOutput({
-        generatedCode: '',
+        codeSnippets: [],
         explanation: 'Sorry, I encountered an error. Please try again.',
         debugSuggestions: '',
       });
@@ -73,6 +83,15 @@ export default function CodeAssistantPage() {
       setIsLoading(false);
     }
   }
+
+  const handleCopy = (code: string, index: number) => {
+    navigator.clipboard.writeText(code);
+    setCopiedStates((prev) => ({ ...prev, [index]: true }));
+    toast({ title: 'Copied to clipboard!' });
+    setTimeout(() => {
+      setCopiedStates((prev) => ({ ...prev, [index]: false }));
+    }, 2000);
+  };
 
   return (
     <div className="p-4 sm:p-6 md:p-8 grid md:grid-cols-2 gap-8 h-full items-start">
@@ -101,11 +120,11 @@ export default function CodeAssistantPage() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="typescript">TypeScript</SelectItem>
-                        <SelectItem value="javascript">JavaScript</SelectItem>
-                        <SelectItem value="python">Python</SelectItem>
                         <SelectItem value="html">HTML</SelectItem>
                         <SelectItem value="css">CSS</SelectItem>
+                        <SelectItem value="javascript">JavaScript</SelectItem>
+                        <SelectItem value="typescript">TypeScript</SelectItem>
+                        <SelectItem value="python">Python</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -120,7 +139,7 @@ export default function CodeAssistantPage() {
                     <FormLabel>Task Description</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="e.g., Write a function to reverse a string."
+                        placeholder="e.g., Create a login form with HTML, CSS, and JS"
                         {...field}
                         rows={4}
                       />
@@ -160,17 +179,31 @@ export default function CodeAssistantPage() {
 
           {output && (
             <>
-              {output.generatedCode && (
-                <Card>
+              {output.codeSnippets && output.codeSnippets.length > 0 && (
+                 <Card>
                   <CardHeader>
                     <CardTitle>Generated Code</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <pre className="bg-muted p-4 rounded-md whitespace-pre-wrap">
-                      <code className="font-code text-sm">
-                        {output.generatedCode}
-                      </code>
-                    </pre>
+                  <CardContent className="space-y-4">
+                     {output.codeSnippets.map((snippet, index) => (
+                      <div key={index}>
+                        <div className="flex justify-between items-center mb-2">
+                           <Badge variant="secondary" className="capitalize">{snippet.language}</Badge>
+                           <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleCopy(snippet.code, index)}
+                          >
+                            {copiedStates[index] ? <Check className="h-4 w-4 text-green-500" /> : <Clipboard className="h-4 w-4" />}
+                          </Button>
+                        </div>
+                        <pre className="bg-muted p-4 rounded-md overflow-x-auto">
+                          <code className="font-code text-sm whitespace-pre-wrap">
+                            {snippet.code}
+                          </code>
+                        </pre>
+                      </div>
+                    ))}
                   </CardContent>
                 </Card>
               )}

@@ -23,8 +23,13 @@ export type CodeAssistantForLearningInput = z.infer<
   typeof CodeAssistantForLearningInputSchema
 >;
 
+const CodeSnippetSchema = z.object({
+  language: z.string().describe('The programming language of the code snippet (e.g., html, css, javascript).'),
+  code: z.string().describe('The generated code snippet for the specified language.'),
+});
+
 const CodeAssistantForLearningOutputSchema = z.object({
-  generatedCode: z.string().describe('The generated code snippet.'),
+  codeSnippets: z.array(CodeSnippetSchema).describe('An array of generated code snippets, especially when multiple languages are requested (e.g., HTML, CSS, JavaScript).'),
   explanation: z.string().describe('The explanation of the code snippet.'),
   debugSuggestions: z
     .string()
@@ -44,7 +49,14 @@ const prompt = ai.definePrompt({
   name: 'codeAssistantForLearningPrompt',
   input: {schema: CodeAssistantForLearningInputSchema},
   output: {schema: CodeAssistantForLearningOutputSchema},
-  prompt: `You are a code assistant designed to help users learn new coding skills.  Generate code, debug, and explain code snippets. The programming language is {{{programmingLanguage}}}. The task description is {{{taskDescription}}}.  Provide an explanation of the code snippet and suggestions for debugging the code.
+  prompt: `You are a code assistant designed to help users learn new coding skills.  Generate code, debug, and explain code snippets.
+
+The user selected programming language is {{{programmingLanguage}}}.
+The user task description is: {{{taskDescription}}}.
+
+If the user asks for multiple languages (like HTML, CSS, and JavaScript), provide separate code snippets for each language in the 'codeSnippets' array. Each object in the array should contain the language and the corresponding code. If only one language is requested, provide a single entry in the 'codeSnippets' array.
+
+Also provide a clear explanation of the code and suggestions for debugging.
 `,
 });
 
