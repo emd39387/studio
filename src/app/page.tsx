@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -27,7 +26,7 @@ import { Input } from '@/components/ui/input';
 import { ZoonLogo } from '@/components/icons';
 
 const formSchema = z.object({
-  name: z.string().min(2, { message: 'Please enter your name.' }),
+  name: z.string().min(1, { message: 'Please enter your name.' }),
 });
 
 export default function NamePage() {
@@ -43,12 +42,10 @@ export default function NamePage() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    // In a real app, you'd likely save this to localStorage or a state manager
-    console.log('User name:', values.name);
     if (typeof window !== 'undefined') {
       localStorage.setItem('userName', values.name);
     }
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 500));
     router.push('/dashboard');
   }
 
