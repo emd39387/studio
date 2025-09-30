@@ -62,7 +62,7 @@ export default function NamePage() {
         <CardHeader>
           <CardTitle className="text-2xl">Welcome</CardTitle>
           <CardDescription>
-            Please enter your name to continue.
+            What is your good name?
           </CardDescription>
         </CardHeader>
         <CardContent>
