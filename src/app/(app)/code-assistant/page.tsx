@@ -166,7 +166,7 @@ export default function CodeAssistantPage() {
                     <CardTitle>Generated Code</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <pre className="bg-muted p-4 rounded-md overflow-x-auto">
+                    <pre className="bg-muted p-4 rounded-md whitespace-pre-wrap">
                       <code className="font-code text-sm">
                         {output.generatedCode}
                       </code>
