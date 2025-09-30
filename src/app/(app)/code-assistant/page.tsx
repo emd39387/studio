@@ -21,22 +21,13 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { codeAssistantForLearning } from '@/ai/flows/code-assistant-learning';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
-  programmingLanguage: z.string().min(1, { message: 'Please select a language.' }),
   taskDescription: z.string().min(1, { message: 'Please describe the task.' }),
 });
 
@@ -60,7 +51,6 @@ export default function CodeAssistantPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      programmingLanguage: 'typescript',
       taskDescription: '',
     },
   });
@@ -107,30 +97,6 @@ export default function CodeAssistantPage() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="programmingLanguage"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Programming Language</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a language" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="html">HTML</SelectItem>
-                        <SelectItem value="css">CSS</SelectItem>
-                        <SelectItem value="javascript">JavaScript</SelectItem>
-                        <SelectItem value="typescript">TypeScript</SelectItem>
-                        <SelectItem value="python">Python</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
               <FormField
                 control={form.control}
                 name="taskDescription"
